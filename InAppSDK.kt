@@ -235,7 +235,7 @@ internal class APIClient(private val configuration: Configuration) {
     suspend fun fetchEntitlements(externalCustomerId: String): List<String> =
         withContext(Dispatchers.IO) {
             val baseURL = configuration.options.baseURL ?: configuration.environment.baseURL
-            val url = "$baseURL/v1/entitlements/$externalCustomerId"
+            val url = "$baseURL/entitlements/$externalCustomerId"
 
             val request = Request.Builder()
                 .url(url)
