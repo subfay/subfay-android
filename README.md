@@ -1,6 +1,6 @@
-# InApp Platform Android SDK
+# Subfay Android SDK
 
-Kotlin SDK for integrating InApp Platform into your Android apps.
+Kotlin SDK for integrating Subfay into your Android apps.
 
 ## Requirements
 
@@ -16,7 +16,7 @@ Add to your `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("com.inappplatform:sdk-android:1.0.0")
+    implementation("com.subfay:sdk-android:1.0.0")
 }
 ```
 
@@ -24,7 +24,7 @@ dependencies {
 
 ```groovy
 dependencies {
-    implementation 'com.inappplatform:sdk-android:1.0.0'
+    implementation 'com.subfay:sdk-android:1.0.0'
 }
 ```
 
@@ -32,7 +32,7 @@ dependencies {
 
 ```xml
 <dependency>
-    <groupId>com.inappplatform</groupId>
+    <groupId>com.subfay</groupId>
     <artifactId>sdk-android</artifactId>
     <version>1.0.0</version>
 </dependency>
@@ -46,14 +46,14 @@ In your `Application` class:
 
 ```kotlin
 import android.app.Application
-import com.inappplatform.sdk.InAppSDK
-import com.inappplatform.sdk.Environment
+import com.subfay.sdk.Subfay
+import com.subfay.sdk.Environment
 
 class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        InAppSDK.configure(
+        Subfay.configure(
             context = this,
             apiKey = "your_api_key_here",
             environment = Environment.PRODUCTION
@@ -79,7 +79,7 @@ After user logs in:
 import kotlinx.coroutines.launch
 
 lifecycleScope.launch {
-    InAppSDK.identify(externalUserId = "user_123")
+    Subfay.identify(externalUserId = "user_123")
 }
 ```
 
@@ -88,7 +88,7 @@ lifecycleScope.launch {
 ```kotlin
 // Check single entitlement
 lifecycleScope.launch {
-    val hasPremium = InAppSDK.hasEntitlement("premium_access")
+    val hasPremium = Subfay.hasEntitlement("premium_access")
 
     if (hasPremium) {
         // Show premium features
@@ -99,7 +99,7 @@ lifecycleScope.launch {
 
 // Get all entitlements
 lifecycleScope.launch {
-    val entitlements = InAppSDK.getEntitlements()
+    val entitlements = Subfay.getEntitlements()
     println("User has: $entitlements")
 }
 ```
@@ -112,7 +112,7 @@ lifecycleScope.launch {
 import kotlinx.coroutines.flow.collect
 
 lifecycleScope.launch {
-    InAppSDK.entitlementsFlow.collect { entitlements ->
+    Subfay.entitlementsFlow.collect { entitlements ->
         println("Entitlements updated: $entitlements")
         updateUI()
     }
@@ -123,8 +123,8 @@ lifecycleScope.launch {
 
 ```kotlin
 import androidx.compose.runtime.*
-import com.inappplatform.sdk.rememberEntitlements
-import com.inappplatform.sdk.rememberHasEntitlement
+import com.subfay.sdk.rememberEntitlements
+import com.subfay.sdk.rememberHasEntitlement
 
 @Composable
 fun PremiumFeature() {
@@ -152,8 +152,8 @@ fun EntitlementsList() {
 ### Configuration Options
 
 ```kotlin
-import com.inappplatform.sdk.ConfigOptions
-import com.inappplatform.sdk.LogLevel
+import com.subfay.sdk.ConfigOptions
+import com.subfay.sdk.LogLevel
 
 val options = ConfigOptions(
     cacheExpiration = 3600_000L,  // 1 hour in ms
@@ -163,7 +163,7 @@ val options = ConfigOptions(
     baseURL = null                 // Use default URL
 )
 
-InAppSDK.configure(
+Subfay.configure(
     context = this,
     apiKey = "your_api_key",
     environment = Environment.PRODUCTION,
@@ -177,7 +177,7 @@ Force refresh entitlements from server:
 
 ```kotlin
 lifecycleScope.launch {
-    val entitlements = InAppSDK.syncEntitlements()
+    val entitlements = Subfay.syncEntitlements()
 }
 ```
 
@@ -186,7 +186,7 @@ lifecycleScope.launch {
 Clear user data:
 
 ```kotlin
-InAppSDK.logout()
+Subfay.logout()
 ```
 
 ## Activity Example
@@ -195,7 +195,7 @@ InAppSDK.logout()
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.inappplatform.sdk.InAppSDK
+import com.subfay.sdk.Subfay
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -211,7 +211,7 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun checkPremiumAccess() {
         try {
-            val hasPremium = InAppSDK.hasEntitlement("premium_access")
+            val hasPremium = Subfay.hasEntitlement("premium_access")
 
             if (hasPremium) {
                 showPremiumContent()
@@ -240,7 +240,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.inappplatform.sdk.InAppSDK
+import com.subfay.sdk.Subfay
 import kotlinx.coroutines.launch
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
@@ -249,7 +249,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         super.onViewCreated(view, savedInstanceState)
 
         lifecycleScope.launch {
-            val entitlements = InAppSDK.getEntitlements()
+            val entitlements = Subfay.getEntitlements()
             updateUI(entitlements)
         }
     }
@@ -265,7 +265,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 ```kotlin
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.inappplatform.sdk.InAppSDK
+import com.subfay.sdk.Subfay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -282,21 +282,21 @@ class MainViewModel : ViewModel() {
 
     fun identifyUser(userId: String) {
         viewModelScope.launch {
-            InAppSDK.identify(externalUserId = userId)
+            Subfay.identify(externalUserId = userId)
             checkPremiumStatus()
         }
     }
 
     private fun observeEntitlements() {
         viewModelScope.launch {
-            InAppSDK.entitlementsFlow.collect { entitlements ->
+            Subfay.entitlementsFlow.collect { entitlements ->
                 _hasPremium.value = entitlements.contains("premium_access")
             }
         }
     }
 
     private suspend fun checkPremiumStatus() {
-        _hasPremium.value = InAppSDK.hasEntitlement("premium_access")
+        _hasPremium.value = Subfay.hasEntitlement("premium_access")
     }
 }
 ```
@@ -304,15 +304,15 @@ class MainViewModel : ViewModel() {
 ## Error Handling
 
 ```kotlin
-import com.inappplatform.sdk.InAppException
+import com.subfay.sdk.SubfayException
 
 try {
-    val entitlements = InAppSDK.getEntitlements()
-} catch (e: InAppException.NetworkError) {
+    val entitlements = Subfay.getEntitlements()
+} catch (e: SubfayException.NetworkError) {
     println("Network error: ${e.message}")
-} catch (e: InAppException.AuthenticationError) {
+} catch (e: SubfayException.AuthenticationError) {
     println("Auth error: ${e.message}")
-} catch (e: InAppException.ServerError) {
+} catch (e: SubfayException.ServerError) {
     println("Server error ${e.statusCode}: ${e.message}")
 } catch (e: Exception) {
     println("Unknown error: ${e.message}")
@@ -324,7 +324,7 @@ try {
 ### Unit Tests
 
 ```kotlin
-import com.inappplatform.sdk.InAppSDK
+import com.subfay.sdk.Subfay
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.Assert.*
@@ -334,10 +334,10 @@ class EntitlementTest {
     @Test
     fun testHasPremiumAccess() = runTest {
         // Identify test user
-        InAppSDK.identify(externalUserId = "test_user")
+        Subfay.identify(externalUserId = "test_user")
 
         // Check entitlement
-        val hasPremium = InAppSDK.hasEntitlement("premium_access")
+        val hasPremium = Subfay.hasEntitlement("premium_access")
         assertTrue(hasPremium)
     }
 }
@@ -348,20 +348,20 @@ class EntitlementTest {
 ```kotlin
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.inappplatform.sdk.InAppSDK
-import com.inappplatform.sdk.Environment
+import com.subfay.sdk.Subfay
+import com.subfay.sdk.Environment
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class InAppSDKInstrumentedTest {
+class SubfayInstrumentedTest {
 
     @Before
     fun setup() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        InAppSDK.configure(
+        Subfay.configure(
             context = context,
             apiKey = "test_key",
             environment = Environment.SANDBOX
@@ -370,7 +370,7 @@ class InAppSDKInstrumentedTest {
 
     @Test
     fun testIdentifyUser() = runBlocking {
-        val customer = InAppSDK.identify("test_user")
+        val customer = Subfay.identify("test_user")
         assertEquals("test_user", customer.externalId)
     }
 }
@@ -401,9 +401,9 @@ Add to `AndroidManifest.xml`:
 If using ProGuard/R8, add these rules:
 
 ```proguard
-# InApp SDK
--keep class com.inappplatform.sdk.** { *; }
--keepclassmembers class com.inappplatform.sdk.** { *; }
+# Subfay SDK
+-keep class com.subfay.sdk.** { *; }
+-keepclassmembers class com.subfay.sdk.** { *; }
 
 # OkHttp
 -dontwarn okhttp3.**
@@ -433,21 +433,21 @@ Purchases.sharedInstance.getCustomerInfo { customerInfo, error ->
 }
 ```
 
-### After (InApp Platform)
+### After (Subfay)
 
 ```kotlin
-import com.inappplatform.sdk.InAppSDK
-import com.inappplatform.sdk.Environment
+import com.subfay.sdk.Subfay
+import com.subfay.sdk.Environment
 
-InAppSDK.configure(
+Subfay.configure(
     context = this,
     apiKey = "your_api_key",
     environment = Environment.PRODUCTION
 )
 
 lifecycleScope.launch {
-    InAppSDK.identify(externalUserId = "user_123")
-    val hasPremium = InAppSDK.hasEntitlement("premium_access")
+    Subfay.identify(externalUserId = "user_123")
+    val hasPremium = Subfay.hasEntitlement("premium_access")
     // Show premium
 }
 ```
@@ -456,11 +456,11 @@ lifecycleScope.launch {
 
 ### SDK Not Configured Error
 
-Make sure you call `InAppSDK.configure()` in `Application.onCreate()`.
+Make sure you call `Subfay.configure()` in `Application.onCreate()`.
 
 ### Authentication Error
 
-Call `InAppSDK.identify()` before checking entitlements.
+Call `Subfay.identify()` before checking entitlements.
 
 ### Network Errors
 
@@ -477,7 +477,7 @@ Always call suspend functions from a proper coroutine scope:
 
 Clear cache manually:
 ```kotlin
-InAppSDK.logout()  // Clears all cached data
+Subfay.logout()  // Clears all cached data
 ```
 
 ## Performance
@@ -489,10 +489,10 @@ InAppSDK.logout()  // Clears all cached data
 
 ## Support
 
-- **Documentation**: https://docs.inappplatform.com
-- **API Reference**: https://docs.inappplatform.com/android
-- **GitHub Issues**: https://github.com/yourusername/inappplatform-android-sdk/issues
-- **Email**: support@inappplatform.com
+- **Documentation**: https://docs.subfay.com
+- **API Reference**: https://docs.subfay.com/android
+- **GitHub Issues**: https://github.com/yourusername/subfay-android-sdk/issues
+- **Email**: support@subfay.com
 
 ## License
 

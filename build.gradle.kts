@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.inappplatform.sdk"
+    namespace = "com.subfay.sdk"
     compileSdk = 34
 
     defaultConfig {
@@ -73,8 +73,8 @@ dependencies {
 publishing {
     publications {
         create<MavenPublication>("release") {
-            groupId = "com.inappplatform"
-            artifactId = "sdk-android"
+            groupId = "com.subfay"
+            artifactId = "subfay-android"
             version = "1.0.0"
 
             afterEvaluate {
@@ -82,8 +82,8 @@ publishing {
             }
 
             pom {
-                name.set("InApp Platform Android SDK")
-                description.set("Android SDK for InApp Platform entitlement management")
+                name.set("Subfay Android SDK")
+                description.set("Android SDK for Subfay entitlement management")
                 url.set("https://github.com/subfay/subfay-android")
 
                 licenses {
@@ -95,9 +95,9 @@ publishing {
 
                 developers {
                     developer {
-                        id.set("inappplatform")
-                        name.set("InApp Platform Team")
-                        email.set("support@inappplatform.com")
+                        id.set("subfay")
+                        name.set("Subfay")
+                        email.set("support@subfay.com")
                     }
                 }
 

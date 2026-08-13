@@ -1,4 +1,4 @@
-package com.inappplatform.sdk
+package com.subfay.sdk
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -11,10 +11,10 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 /**
- * InApp Platform Android SDK
+ * Subfay Android SDK
  * Provides seamless entitlement management for Android apps
  */
-object InAppSDK {
+object Subfay {
 
     private var configuration: Configuration? = null
     private var apiClient: APIClient? = null
@@ -33,7 +33,7 @@ object InAppSDK {
     /**
      * Configure the SDK with API credentials
      * @param context Application context
-     * @param apiKey Your API key from InApp Platform dashboard
+     * @param apiKey Your API key from Subfay dashboard
      * @param environment The environment (PRODUCTION or SANDBOX)
      * @param options Optional configuration options
      */
@@ -50,7 +50,7 @@ object InAppSDK {
         apiClient = APIClient(config)
         cacheManager = CacheManager(appContext, config)
 
-        InAppLogger.log("SDK configured for $environment", LogLevel.INFO)
+        SubfayLogger.log("SDK configured for $environment", LogLevel.INFO)
     }
 
     // MARK: - Customer Management
@@ -63,7 +63,7 @@ object InAppSDK {
     suspend fun identify(externalUserId: String): Customer {
         ensureConfigured()
 
-        InAppLogger.log("Identifying user: $externalUserId", LogLevel.DEBUG)
+        SubfayLogger.log("Identifying user: $externalUserId", LogLevel.DEBUG)
 
         val customer = Customer(
             id = java.util.UUID.randomUUID().toString(),
@@ -96,7 +96,7 @@ object InAppSDK {
         currentCustomer = null
         cacheManager?.clearAll()
         _entitlementsFlow.value = emptyList()
-        InAppLogger.log("User logged out", LogLevel.INFO)
+        SubfayLogger.log("User logged out", LogLevel.INFO)
     }
 
     // MARK: - Entitlements
@@ -109,12 +109,12 @@ object InAppSDK {
         ensureConfigured()
 
         val customer = getCurrentCustomer()
-            ?: throw InAppException.AuthenticationError("No customer identified. Call identify() first.")
+            ?: throw SubfayException.AuthenticationError("No customer identified. Call identify() first.")
 
         // Try cache first
         val cached = cacheManager?.loadEntitlements()
         if (cached != null && cacheManager?.isCacheExpired() == false) {
-            InAppLogger.log("Entitlements loaded from cache", LogLevel.DEBUG)
+            SubfayLogger.log("Entitlements loaded from cache", LogLevel.DEBUG)
             return cached
         }
 
@@ -140,7 +140,7 @@ object InAppSDK {
         ensureConfigured()
 
         val customer = getCurrentCustomer()
-            ?: throw InAppException.AuthenticationError("No customer identified")
+            ?: throw SubfayException.AuthenticationError("No customer identified")
 
         return fetchEntitlementsFromServer(customer)
     }
@@ -149,17 +149,17 @@ object InAppSDK {
 
     private fun ensureConfigured() {
         if (configuration == null) {
-            throw InAppException.InvalidConfiguration(
-                "SDK not configured. Call InAppSDK.configure() first."
+            throw SubfayException.InvalidConfiguration(
+                "SDK not configured. Call Subfay.configure() first."
             )
         }
     }
 
     private suspend fun fetchEntitlementsFromServer(customer: Customer): List<String> {
         val client = apiClient
-            ?: throw InAppException.InvalidConfiguration("API client not initialized")
+            ?: throw SubfayException.InvalidConfiguration("API client not initialized")
 
-        InAppLogger.log("Fetching entitlements from server", LogLevel.DEBUG)
+        SubfayLogger.log("Fetching entitlements from server", LogLevel.DEBUG)
 
         val entitlements = client.fetchEntitlements(customer.externalId)
 
@@ -169,7 +169,7 @@ object InAppSDK {
         // Notify observers
         _entitlementsFlow.value = entitlements
 
-        InAppLogger.log("Entitlements updated: $entitlements", LogLevel.INFO)
+        SubfayLogger.log("Entitlements updated: $entitlements", LogLevel.INFO)
 
         return entitlements
     }
@@ -199,8 +199,8 @@ data class ConfigOptions(
 )
 
 enum class Environment(val baseURL: String) {
-    PRODUCTION("https://api.inappplatform.com"),
-    SANDBOX("https://sandbox-api.inappplatform.com")
+    PRODUCTION("https://api.subfay.com"),
+    SANDBOX("https://sandbox-api.subfay.com")
 }
 
 enum class LogLevel(val value: Int) {
@@ -214,12 +214,12 @@ enum class LogLevel(val value: Int) {
 
 // MARK: - Exceptions
 
-sealed class InAppException(message: String) : Exception(message) {
-    class NetworkError(message: String) : InAppException(message)
-    class AuthenticationError(message: String) : InAppException(message)
-    class InvalidConfiguration(message: String) : InAppException(message)
-    class ServerError(val statusCode: Int, message: String) : InAppException(message)
-    class CacheError(message: String) : InAppException(message)
+sealed class SubfayException(message: String) : Exception(message) {
+    class NetworkError(message: String) : SubfayException(message)
+    class AuthenticationError(message: String) : SubfayException(message)
+    class InvalidConfiguration(message: String) : SubfayException(message)
+    class ServerError(val statusCode: Int, message: String) : SubfayException(message)
+    class CacheError(message: String) : SubfayException(message)
 }
 
 // MARK: - API Client
@@ -242,18 +242,18 @@ internal class APIClient(private val configuration: Configuration) {
                 .get()
                 .addHeader("X-API-Key", configuration.apiKey)
                 .addHeader("Content-Type", "application/json")
-                .addHeader("User-Agent", "InAppSDK/Android/1.0.0")
+                .addHeader("User-Agent", "Subfay/Android/1.0.0")
                 .build()
 
             val response = client.newCall(request).execute()
 
             if (!response.isSuccessful) {
                 val errorBody = response.body?.string() ?: "Unknown error"
-                throw InAppException.ServerError(response.code, errorBody)
+                throw SubfayException.ServerError(response.code, errorBody)
             }
 
             val responseBody = response.body?.string()
-                ?: throw InAppException.NetworkError("Empty response body")
+                ?: throw SubfayException.NetworkError("Empty response body")
 
             val json = JSONObject(responseBody)
             val dataObject = json.getJSONObject("data")
@@ -272,14 +272,14 @@ internal class CacheManager(
     private val configuration: Configuration
 ) {
     private val prefs: SharedPreferences = context.getSharedPreferences(
-        "inapp_sdk_cache",
+        "subfay_cache",
         Context.MODE_PRIVATE
     )
 
     companion object {
-        private const val KEY_CUSTOMER = "inapp_customer"
-        private const val KEY_ENTITLEMENTS = "inapp_entitlements"
-        private const val KEY_LAST_SYNC = "inapp_last_sync"
+        private const val KEY_CUSTOMER = "subfay_customer"
+        private const val KEY_ENTITLEMENTS = "subfay_entitlements"
+        private const val KEY_LAST_SYNC = "subfay_last_sync"
     }
 
     fun saveCustomer(customer: Customer) {
@@ -336,7 +336,7 @@ internal class CacheManager(
 
 // MARK: - Logger
 
-internal object InAppLogger {
+internal object SubfayLogger {
     private var logLevel = LogLevel.INFO
 
     fun setLogLevel(level: LogLevel) {
@@ -355,7 +355,7 @@ internal object InAppLogger {
             LogLevel.NONE -> return
         }
 
-        println("$prefix [InAppSDK] $message")
+        println("$prefix [Subfay] $message")
     }
 }
 
@@ -367,7 +367,7 @@ internal object InAppLogger {
  */
 @androidx.compose.runtime.Composable
 fun rememberEntitlements(): androidx.compose.runtime.State<List<String>> {
-    return InAppSDK.entitlementsFlow.collectAsState()
+    return Subfay.entitlementsFlow.collectAsState()
 }
 
 /**
