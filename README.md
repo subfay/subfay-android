@@ -491,7 +491,7 @@ Subfay.logout()  // Clears all cached data
 
 - **Documentation**: https://docs.subfay.com
 - **API Reference**: https://docs.subfay.com/android
-- **GitHub Issues**: https://github.com/yourusername/subfay-android-sdk/issues
+- **GitHub Issues**: https://github.com/subfay/subfay-android/issues
 - **Email**: support@subfay.com
 
 ## License
