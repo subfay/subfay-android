@@ -10,33 +10,54 @@ Kotlin SDK for integrating Subfay into your Android apps.
 
 ## Installation
 
+Distributed via [JitPack](https://jitpack.io). Add the JitPack repository, then
+the dependency.
+
 ### Gradle (Kotlin DSL)
 
-Add to your `build.gradle.kts`:
+`settings.gradle.kts`:
+
+```kotlin
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url = uri("https://jitpack.io") }
+    }
+}
+```
+
+`build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("com.subfay:sdk-android:1.0.0")
+    implementation("com.github.subfay:subfay-android:v1.0.1")
 }
 ```
 
 ### Gradle (Groovy)
 
+`settings.gradle`:
+
 ```groovy
-dependencies {
-    implementation 'com.subfay:sdk-android:1.0.0'
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
 }
 ```
 
-### Maven
+`build.gradle`:
 
-```xml
-<dependency>
-    <groupId>com.subfay</groupId>
-    <artifactId>sdk-android</artifactId>
-    <version>1.0.0</version>
-</dependency>
+```groovy
+dependencies {
+    implementation 'com.github.subfay:subfay-android:v1.0.1'
+}
 ```
+
+> Maven Central publishing (a `com.subfay:subfay-android` coordinate) is planned.
 
 ## Quick Start
 
