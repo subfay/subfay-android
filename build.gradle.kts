@@ -84,7 +84,7 @@ publishing {
             pom {
                 name.set("InApp Platform Android SDK")
                 description.set("Android SDK for InApp Platform entitlement management")
-                url.set("https://github.com/yourusername/inappplatform-android-sdk")
+                url.set("https://github.com/subfay/subfay-android")
 
                 licenses {
                     license {
@@ -102,9 +102,9 @@ publishing {
                 }
 
                 scm {
-                    connection.set("scm:git:git://github.com/yourusername/inappplatform-android-sdk.git")
-                    developerConnection.set("scm:git:ssh://github.com/yourusername/inappplatform-android-sdk.git")
-                    url.set("https://github.com/yourusername/inappplatform-android-sdk")
+                    connection.set("scm:git:git://github.com/subfay/subfay-android.git")
+                    developerConnection.set("scm:git:ssh://github.com/subfay/subfay-android.git")
+                    url.set("https://github.com/subfay/subfay-android")
                 }
             }
         }
